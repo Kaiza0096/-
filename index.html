@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>言語選択</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .language-btn {
+      display: inline-block;
+      margin: 10px;
+      padding: 15px 30px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+    }
+    .language-btn:hover {
+      background-color: #45a049;
+    }
+    #player-container {
+      margin-top: 30px;
+      display: none;
+    }
+    h1 {
+      margin-bottom: 30px;
+      white-space: nowrap;
+    }
+    .flag {
+      width: 30px;
+      height: auto;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    #language-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+    #loading-indicator {
+      display: none;
+      margin-top: 20px;
+      color: #666;
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.2em;
+        white-space: normal;
+      }
+      .language-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        width: 80%;
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>言語を選択してください / Select a language / 选择语言</h1>
+  
+  <div id="language-buttons">
+    <button class="language-btn" onclick="playAudio('ja')">
+      <img src="https://flagcdn.com/48x36/jp.png" class="flag">日本語
+    </button>
+    <button class="language-btn" onclick="playAudio('en')">
+      <img src="https://flagcdn.com/48x36/us.png" class="flag">English
+    </button>
+    <button class="language-btn" onclick="playAudio('zh')">
+      <img src="https://flagcdn.com/48x36/cn.png" class="flag">中文
+    </button>
+  </div>
+
+  <div id="loading-indicator">
+    <p>読み込み中... / Loading... / 加载中...</p>
+  </div>
+
+  <div id="player-container">
+    <h2 id="playing-language"></h2>
+    <audio id="audio-player" controls></audio>
+  </div>
+
+  <script>
+    // オーディオファイルの直接リンク
+    const audioFiles = {
+      'ja': 'https://www.dropbox.com/scl/fi/unrp158v9irju5hm2afw1/6177540108056587.mp3?rlkey=2z9cwh0jhtq6qyl0mk68xthcn&st=5kw24o9s&dl=1',
+      'en': 'https://www.dropbox.com/scl/fi/paa81eo7pl93r7vauq1p7/6177540108052663-3.mp3?rlkey=ffev38b1wpw0oquol24rj17me&st=ci4ggoqp&dl=1',
+      'zh': 'https://www.dropbox.com/scl/fi/7ko02rzly6c4u3vs88jdm/6177540108056462.mp3?rlkey=mp2qlwtqdg7lv4995zyn2mql7&st=mezgm9vq&dl=1'
+    };
+
+    // 言語表示名
+    const languageNames = {
+      'ja': '日本語',
+      'en': 'English',
+      'zh': '中文'
+    };
+
+    function playAudio(language) {
+      const audioUrl = audioFiles[language];
+      if (!audioUrl) {
+        alert('この言語のオーディオファイルはまだ準備されていません');
+        return;
+      }
+
+      const loadingIndicator = document.getElementById('loading-indicator');
+      const playerContainer = document.getElementById('player-container');
+      const audioPlayer = document.getElementById('audio-player');
+      const playingLanguage = document.getElementById('playing-language');
+      
+      // ローディング表示
+      loadingIndicator.style.display = 'block';
+      playerContainer.style.display = 'none';
+      
+      // 言語名を表示
+      playingLanguage.textContent = `再生中: ${languageNames[language]}`;
+      
+      // オーディオのソースを設定
+      audioPlayer.src = audioUrl;
+      
+      // 読み込み完了時の処理
+      audioPlayer.oncanplay = function() {
+        loadingIndicator.style.display = 'none';
+        playerContainer.style.display = 'block';
+        audioPlayer.play().catch(e => {
+          console.error('再生エラー:', e);
+          alert('音声の再生に失敗しました。もう一度お試しください。');
+        });
+      };
+      
+      // エラー処理
+      audioPlayer.onerror = function(e) {
+        console.error('オーディオエラー:', e);
+        loadingIndicator.style.display = 'none';
+        alert('音声ファイルの読み込みに失敗しました。');
+      };
+      
+      // タイムアウト処理（10秒以上読み込みがない場合）
+      const timeoutID = setTimeout(() => {
+        if (audioPlayer.readyState < 3) { // HAVE_FUTURE_DATA未満
+          loadingIndicator.style.display = 'none';
+          alert('音声ファイルの読み込みがタイムアウトしました。インターネット接続を確認してください。');
+        }
+      }, 10000);
+      
+      // タイムアウトのクリア
+      audioPlayer.oncanplay = function() {
+        clearTimeout(timeoutID);
+        loadingIndicator.style.display = 'none';
+        playerContainer.style.display = 'block';
+        audioPlayer.play().catch(e => {
+          console.error('再生エラー:', e);
+          alert('音声の再生に失敗しました。もう一度お試しください。');
+        });
+      };
+    }
+  </script>
+</body>
+</html>
