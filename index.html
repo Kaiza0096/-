@@ -92,11 +92,11 @@
   </div>
 
   <script>
-    // オーディオファイルの直接リンク
+    // ローカルの音声ファイルパス
     const audioFiles = {
-      'ja': 'https://www.dropbox.com/scl/fi/unrp158v9irju5hm2afw1/6177540108056587.mp3?rlkey=2z9cwh0jhtq6qyl0mk68xthcn&st=5kw24o9s&dl=1',
-      'en': 'https://www.dropbox.com/scl/fi/paa81eo7pl93r7vauq1p7/6177540108052663-3.mp3?rlkey=ffev38b1wpw0oquol24rj17me&st=ci4ggoqp&dl=1',
-      'zh': 'https://www.dropbox.com/scl/fi/7ko02rzly6c4u3vs88jdm/6177540108056462.mp3?rlkey=mp2qlwtqdg7lv4995zyn2mql7&st=mezgm9vq&dl=1'
+      'ja': 'audio/japanese.mp3',
+      'en': 'audio/english.mp3',
+      'zh': 'audio/chinese.mp3'
     };
 
     // 言語表示名
@@ -141,8 +141,10 @@
       // エラー処理
       audioPlayer.onerror = function(e) {
         console.error('オーディオエラー:', e);
+        console.error('エラーコード:', audioPlayer.error ? audioPlayer.error.code : '不明');
         loadingIndicator.style.display = 'none';
-        alert('音声ファイルの読み込みに失敗しました。');
+        alert('音声ファイルの読み込みに失敗しました。エラー: ' + 
+              (audioPlayer.error ? audioPlayer.error.code : '不明'));
       };
       
       // タイムアウト処理（10秒以上読み込みがない場合）
